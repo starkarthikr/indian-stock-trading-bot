@@ -1,8 +1,10 @@
 # 🚀 Quick Start Guide
 
-## ✅ Status: Ready to Use!
+## ✅ Status: FIXED & Ready to Use!
 
-Your automated Indian stock trading bot is **fully configured** and ready to run.
+All dependency issues are resolved. Your automated Indian stock trading bot is ready to run.
+
+**Fix Applied:** Using `pandas-ta-classic==0.3.59` (actual latest version from PyPI)
 
 ---
 
@@ -37,7 +39,7 @@ Your automated Indian stock trading bot is **fully configured** and ready to run
 
 The workflow will:
 
-1. ✅ Install all dependencies (pandas-ta-classic for Python 3.11)
+1. ✅ Install dependencies (pandas-ta-classic==0.3.59 for Python 3.11)
 2. 📈 Fetch data for 30 NSE stocks
 3. 🔍 Calculate technical indicators (RSI, MACD, Moving Averages, Bollinger Bands)
 4. 🎯 Identify buy signals with 0-10 scoring
@@ -110,18 +112,21 @@ To get more signals:
 - Reduce volume ratio to 1.2
 - Expand watchlist to more stocks
 
-### Workflow Fails
+### Workflow Fails at Dependencies
+
+✅ **FIXED:** Now using `pandas-ta-classic==0.3.59` (actual version from PyPI)
+
+If you still see errors:
+1. Ensure you're running a **NEW** workflow (not re-running old failed one)
+2. Check [Issue #3](https://github.com/starkarthikr/indian-stock-trading-bot/issues/3) for verification
+3. Review [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+
+### Other Issues
 
 Check:
 1. GitHub Actions are enabled
-2. No recent commits broke the code
+2. Latest commit is [1e75458](https://github.com/starkarthikr/indian-stock-trading-bot/commit/1e75458068d4b1e68852d7a82c7a07f7bec65de0) or later
 3. Review [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
-
-### Dependencies Error
-
-✅ **FIXED:** Now using `pandas-ta-classic>=1.0.0` which is Python 3.11 compatible.
-
-If issues persist, check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ---
 
@@ -131,6 +136,7 @@ If issues persist, check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 - **[SETUP_GUIDE.md](docs/SETUP_GUIDE.md)** - Detailed setup instructions
 - **[CUSTOMIZATION.md](docs/CUSTOMIZATION.md)** - Modify indicators, schedules, watchlists
 - **[TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Solutions for common issues
+- **[Issue #3](https://github.com/starkarthikr/indian-stock-trading-bot/issues/3)** - Final fix documentation
 
 ---
 
@@ -139,7 +145,7 @@ If issues persist, check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 ### Current Configuration
 
 - **Python Version:** 3.11
-- **Dependencies:** pandas-ta-classic (Python 3.11 compatible)
+- **pandas-ta Package:** pandas-ta-classic==0.3.59
 - **Schedule:** 3x daily (9:30 AM, 12 PM, 3 PM IST)
 - **Watchlist:** 30 NSE stocks (Nifty 50 + high-liquidity)
 - **Indicators:** RSI, MACD, SMA, EMA, Bollinger Bands, Volume
@@ -181,5 +187,6 @@ Your trading bot is ready to run. Follow the 3 steps above to start automated an
 ---
 
 **Last Updated:** February 16, 2026  
-**Fix Status:** ✅ pandas-ta-classic installed (Python 3.11 compatible)  
-**Latest Commit:** [d8b3324](https://github.com/starkarthikr/indian-stock-trading-bot/commit/d8b3324fcac379f05f45017f64f4aa00358b9654)
+**Fix Status:** ✅ pandas-ta-classic==0.3.59 installed (Python 3.11 compatible)  
+**Latest Commit:** [1e75458](https://github.com/starkarthikr/indian-stock-trading-bot/commit/1e75458068d4b1e68852d7a82c7a07f7bec65de0)  
+**Verification:** [Issue #3](https://github.com/starkarthikr/indian-stock-trading-bot/issues/3)
