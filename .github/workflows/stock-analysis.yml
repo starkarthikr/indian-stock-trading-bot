@@ -1,0 +1,113 @@
+name: Indian Stock Market Analysis
+
+on:
+  schedule:
+    # Runs at 9:30 AM, 12:00 PM, and 3:00 PM IST (4:00 AM, 6:30 AM, 9:30 AM UTC)
+    # Avoids exact hour marks to prevent GitHub Actions delays
+    - cron: '0 4 * * 1-5'   # 9:30 AM IST (Market Open)
+    - cron: '30 6 * * 1-5'  # 12:00 PM IST (Mid-day)
+    - cron: '30 9 * * 1-5'  # 3:00 PM IST (Market Close)
+  
+  workflow_dispatch:  # Manual trigger for testing
+    inputs:
+      min_rsi_oversold:
+        description: 'Minimum RSI for oversold condition'
+        required: false
+        default: '30'
+      min_volume_ratio:
+        description: 'Minimum volume ratio threshold'
+        required: false
+        default: '1.5'
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANALYSIS_OUTPUT_DIR: 'analysis_results'
+
+jobs:
+  stock-analysis:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      issues: write
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Stock Analysis
+        env:
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          MIN_RSI_OVERSOLD: ${{ github.event.inputs.min_rsi_oversold || '30' }}
+          MIN_VOLUME_RATIO: ${{ github.event.inputs.min_volume_ratio || '1.5' }}
+        run: |
+          python scripts/analyze_stocks.py
+      
+      - name: Generate Summary Report
+        run: |
+          python scripts/generate_report.py
+      
+      - name: Commit Analysis Results
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ${{ env.ANALYSIS_OUTPUT_DIR }}
+          git diff --quiet && git diff --staged --quiet || git commit -m "📊 Stock analysis: $(date +'%Y-%m-%d %H:%M IST')"
+          git push
+      
+      - name: Create Issue for High-Priority Signals
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = '${{ env.ANALYSIS_OUTPUT_DIR }}/latest_signals.json';
+            
+            if (fs.existsSync(reportPath)) {
+              const signals = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+              
+              if (signals.high_priority && signals.high_priority.length > 0) {
+                const body = signals.high_priority.map(s => 
+                  `### ${s.symbol} - ${s.company_name}\n` +
+                  `**Current Price:** ₹${s.current_price}\n` +
+                  `**Buy Signal Strength:** ${s.signal_strength}/10\n` +
+                  `**Entry Point:** ₹${s.entry_point}\n` +
+                  `**Target Price:** ₹${s.target_price} (${s.profit_potential}% upside)\n` +
+                  `**Stop Loss:** ₹${s.stop_loss}\n` +
+                  `**Technical Indicators:**\n` +
+                  `- RSI: ${s.rsi}\n` +
+                  `- MACD Signal: ${s.macd_signal}\n` +
+                  `- Volume Surge: ${s.volume_ratio}x\n` +
+                  `**Reasoning:** ${s.reasoning}\n\n---\n`
+                ).join('\n');
+                
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `🚨 High-Priority Trading Signals - ${new Date().toLocaleDateString('en-IN')}`,
+                  body: `## Stock Recommendations\n\n${body}\n\n_Generated at: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}_`,
+                  labels: ['trading-signal', 'high-priority']
+                });
+              }
+            }
+      
+      - name: Upload Analysis Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-analysis-${{ github.run_number }}
+          path: ${{ env.ANALYSIS_OUTPUT_DIR }}
+          retention-days: 90
