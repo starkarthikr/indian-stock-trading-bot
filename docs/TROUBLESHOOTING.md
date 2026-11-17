@@ -14,6 +14,8 @@ Common issues and their solutions for the Indian Stock Trading Bot.
 
 ## Installation Issues
 
+> **Note:** the indicators now come from `fin-primitives` (`df['Close'].fp.rsi(...)`, same names and column names as pandas-ta), so the pandas-ta issues below no longer apply. pandas-ta 0.3.14b has been removed from PyPI.
+
 ### Issue: `pandas-ta` Installation Fails
 
 **Error Message:**

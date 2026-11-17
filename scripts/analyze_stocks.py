@@ -2,7 +2,7 @@ import os
 import json
 import requests
 import pandas as pd
-import pandas_ta as ta
+import fin_primitives.pandas  # noqa: F401  registers series.fp (pandas-ta method names)
 import yfinance as yf
 from datetime import datetime, timedelta
 from typing import List, Dict, Tuple
@@ -59,20 +59,20 @@ class IndianStockAnalyzer:
     def calculate_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Calculate RSI, MACD, Moving Averages, and Bollinger Bands."""
         # RSI (14-period)
-        df['RSI'] = ta.rsi(df['Close'], length=14)
+        df['RSI'] = df['Close'].fp.rsi(length=14)
         
         # MACD (12, 26, 9)
-        macd = ta.macd(df['Close'], fast=12, slow=26, signal=9)
+        macd = df['Close'].fp.macd(fast=12, slow=26, signal=9)
         df = pd.concat([df, macd], axis=1)
         
         # Moving Averages
-        df['SMA_20'] = ta.sma(df['Close'], length=20)
-        df['SMA_50'] = ta.sma(df['Close'], length=50)
-        df['EMA_9'] = ta.ema(df['Close'], length=9)
-        df['EMA_21'] = ta.ema(df['Close'], length=21)
+        df['SMA_20'] = df['Close'].fp.sma(length=20)
+        df['SMA_50'] = df['Close'].fp.sma(length=50)
+        df['EMA_9'] = df['Close'].fp.ema(length=9)
+        df['EMA_21'] = df['Close'].fp.ema(length=21)
         
         # Bollinger Bands
-        bbands = ta.bbands(df['Close'], length=20, std=2)
+        bbands = df['Close'].fp.bbands(length=20, std=2)
         df = pd.concat([df, bbands], axis=1)
         
         # Volume indicators
